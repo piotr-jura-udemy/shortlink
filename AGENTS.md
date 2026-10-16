@@ -1,3 +1,12 @@
+# Architecture Decision Records
+
+Before changing stack, auth, data storage, API style, or other cross-cutting architecture, read `docs/decisions/`.
+
+- **Accepted** ADRs are binding. Do not reverse or bypass them in drive-by refactors.
+- To change an Accepted decision: add a new numbered ADR that supersedes it, get agreement, then implement.
+- Never reuse ADR numbers. Follow `docs/decisions/README.md`.
+- Prefer implementing *within* existing ADRs over inventing a parallel approach.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
