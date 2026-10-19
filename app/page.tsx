@@ -1,35 +1,132 @@
-import { Suspense } from "react";
-import { CreateLinkDialog } from "@/components/create-link-dialog";
-import { LinksDashboard } from "@/components/links-dashboard";
+import Link from "next/link";
+import { Link2Icon } from "lucide-react";
+import { FeatureGrid } from "@/components/landing/feature-grid";
+import { ProductDemo } from "@/components/landing/product-demo";
+import { SiteFooter } from "@/components/landing/site-footer";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "cn";
 
-function DashboardFallback() {
+export default function LandingPage() {
   return (
-    <div className="rounded-lg border border-border bg-card px-6 py-16 text-center text-sm text-muted-foreground">
-      Loading links…
-    </div>
-  );
-}
-
-export default function HomePage() {
-  return (
-    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-10 sm:px-6 sm:py-14">
-      <header className="mb-10 flex items-start justify-between gap-6">
-        <div className="min-w-0">
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
-            shortlink
-          </h1>
-          <p className="mt-2 max-w-sm text-sm text-muted-foreground sm:text-base">
-            Compress a URL. Keep the path.
-          </p>
-        </div>
-        <div className="shrink-0 pt-1">
-          <CreateLinkDialog />
-        </div>
+    <div className="flex flex-1 flex-col">
+      <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
+        <Link
+          href="/"
+          className="font-display text-xl font-semibold tracking-tight text-foreground transition-opacity duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:opacity-70"
+        >
+          shortlink
+        </Link>
+        <Link
+          href="/app"
+          className={cn(buttonVariants({ size: "lg" }), "px-4")}
+        >
+          Open app
+        </Link>
       </header>
 
-      <Suspense fallback={<DashboardFallback />}>
-        <LinksDashboard />
-      </Suspense>
+      <main>
+        <section className="mx-auto flex w-full max-w-5xl flex-col items-center px-4 pb-10 pt-12 text-center sm:px-6 sm:pb-14 sm:pt-16">
+          <div
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-medium text-muted-foreground motion-safe:animate-[landing-fade-up_0.7s_cubic-bezier(0.23,1,0.32,1)_both]"
+            style={{ animationDelay: "0ms" }}
+          >
+            <Link2Icon className="size-3.5 text-primary" />
+            URL shortener
+          </div>
+
+          <p
+            className="mt-6 font-display text-5xl font-semibold tracking-tight text-foreground motion-safe:animate-[landing-fade-up_0.7s_cubic-bezier(0.23,1,0.32,1)_both] sm:text-6xl"
+            style={{ animationDelay: "60ms" }}
+          >
+            shortlink
+          </p>
+
+          <h1
+            className="mt-5 max-w-2xl text-2xl font-semibold tracking-tight text-foreground motion-safe:animate-[landing-fade-up_0.7s_cubic-bezier(0.23,1,0.32,1)_both] sm:text-4xl sm:leading-tight"
+            style={{ animationDelay: "120ms" }}
+          >
+            Short paths for long URLs.
+          </h1>
+
+          <p
+            className="mt-4 max-w-lg text-base text-muted-foreground motion-safe:animate-[landing-fade-up_0.7s_cubic-bezier(0.23,1,0.32,1)_both] sm:text-lg"
+            style={{ animationDelay: "180ms" }}
+          >
+            Create short links, copy them in one click, and track how often they
+            get used — all from a single dashboard.
+          </p>
+
+          <div
+            className="mt-8 flex flex-wrap items-center justify-center gap-3 motion-safe:animate-[landing-fade-up_0.7s_cubic-bezier(0.23,1,0.32,1)_both]"
+            style={{ animationDelay: "240ms" }}
+          >
+            <Link
+              href="/app"
+              className={cn(buttonVariants({ size: "lg" }), "px-5")}
+            >
+              Open app
+            </Link>
+            <a
+              href="#how-it-works"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "lg" }),
+                "px-5",
+              )}
+            >
+              How it works
+            </a>
+          </div>
+
+          <div
+            className="mt-14 w-full max-w-4xl motion-safe:animate-[landing-fade-up_0.85s_cubic-bezier(0.23,1,0.32,1)_both] sm:mt-16"
+            style={{ animationDelay: "320ms" }}
+          >
+            <ProductDemo />
+          </div>
+        </section>
+
+        <section
+          id="how-it-works"
+          className="border-t border-border bg-card/40"
+        >
+          <div className="mx-auto w-full max-w-5xl px-4 py-14 sm:px-6 sm:py-20">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-sm font-medium text-primary">What you get</p>
+              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+                Everything the dashboard already does.
+              </h2>
+              <p className="mt-3 text-base text-muted-foreground sm:text-lg">
+                shortlink stays small on purpose: create, list, copy, edit,
+                delete, and count clicks. No accounts, no campaigns console.
+              </p>
+            </div>
+
+            <div className="mt-12 overflow-hidden rounded-xl border border-border bg-card">
+              <FeatureGrid />
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-border">
+          <div className="mx-auto flex w-full max-w-5xl flex-col items-center px-4 py-16 text-center sm:px-6 sm:py-20">
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              Ready to shorten something?
+            </h2>
+            <p className="mt-3 max-w-md text-muted-foreground">
+              Jump into the app and create your first link. Anyone with the URL
+              can manage the list — there is no sign-in yet.
+            </p>
+            <Link
+              href="/app"
+              className={cn(buttonVariants({ size: "lg" }), "mt-8 px-5")}
+            >
+              Open app
+            </Link>
+          </div>
+        </section>
+      </main>
+
+      <SiteFooter />
     </div>
   );
 }

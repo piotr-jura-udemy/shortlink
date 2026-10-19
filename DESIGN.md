@@ -11,7 +11,7 @@ Do not add or revise entries unless humans and the agent explicitly agree that t
 ## Product
 
 - Single-operator URL shortener: create, list, copy, edit, delete links; track click counts.
-- One primary surface today: the links dashboard. No auth — anyone who can reach the app can manage links.
+- Two surfaces: marketing landing at `/`, links dashboard at `/app`. No auth — anyone who can reach `/app` can manage links.
 - Stack, storage, and API shape live in [`docs/decisions/`](docs/decisions/), not here.
 
 ## Open
