@@ -48,11 +48,16 @@ function formatDate(iso: string) {
 
 function CopyButton({ slug }: { slug: string }) {
   const [copied, setCopied] = useState(false);
+  const [flashing, setFlashing] = useState(false);
 
   async function handleCopy() {
     const value = `${window.location.origin}/${slug}`;
     await navigator.clipboard.writeText(value);
-    setCopied(true);
+    setFlashing(true);
+    window.setTimeout(() => {
+      setCopied(true);
+      setFlashing(false);
+    }, 80);
     window.setTimeout(() => setCopied(false), 1500);
   }
 
@@ -62,9 +67,20 @@ function CopyButton({ slug }: { slug: string }) {
       variant="ghost"
       size="icon-sm"
       onClick={handleCopy}
-      aria-label="Copy short link"
+      aria-label={copied ? "Copied" : "Copy short link"}
+      className="text-muted-foreground"
     >
-      {copied ? <CheckIcon /> : <CopyIcon />}
+      <span
+        className={`inline-flex transition-[opacity,filter] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${
+          flashing ? "opacity-70 blur-[2px]" : "opacity-100 blur-0"
+        }`}
+      >
+        {copied ? (
+          <CheckIcon className="text-primary" />
+        ) : (
+          <CopyIcon />
+        )}
+      </span>
     </Button>
   );
 }
@@ -84,10 +100,10 @@ export function LinksTable({ links }: { links: SerializedLink[] }) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-xl border bg-card">
+      <div className="overflow-hidden rounded-lg border border-border bg-card">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="hover:bg-transparent">
               <TableHead>Short link</TableHead>
               <TableHead className="hidden md:table-cell">Destination</TableHead>
               <TableHead className="w-24">Clicks</TableHead>
@@ -104,10 +120,10 @@ export function LinksTable({ links }: { links: SerializedLink[] }) {
               return (
                 <TableRow key={link.id}>
                   <TableCell>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-0.5">
                       <a
                         href={shortPath}
-                        className="font-medium text-foreground hover:underline"
+                        className="font-mono text-sm font-medium text-primary hover:underline"
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -119,14 +135,16 @@ export function LinksTable({ links }: { links: SerializedLink[] }) {
                   <TableCell className="hidden max-w-xs truncate text-muted-foreground md:table-cell">
                     <a
                       href={link.url}
-                      className="hover:underline"
+                      className="hover:text-foreground hover:underline"
                       target="_blank"
                       rel="noreferrer"
                     >
                       {link.url}
                     </a>
                   </TableCell>
-                  <TableCell className="tabular-nums">{link.clicks}</TableCell>
+                  <TableCell className="font-mono text-sm tabular-nums">
+                    {link.clicks}
+                  </TableCell>
                   <TableCell className="hidden text-muted-foreground sm:table-cell">
                     {formatDate(link.createdAt)}
                   </TableCell>
@@ -184,7 +202,7 @@ export function LinksTable({ links }: { links: SerializedLink[] }) {
             <AlertDialogTitle>Delete link?</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete{" "}
-              <span className="font-medium text-foreground">
+              <span className="font-mono font-medium text-foreground">
                 /{deleteTarget?.slug}
               </span>
               . This action cannot be undone.

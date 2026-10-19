@@ -63,7 +63,7 @@ export function EditLinkDialog({
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Edit link</DialogTitle>
+            <DialogTitle className="font-display">Edit link</DialogTitle>
             <DialogDescription>
               Update the destination URL or short slug.
             </DialogDescription>
@@ -86,6 +86,7 @@ export function EditLinkDialog({
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 required
+                className="font-mono"
               />
             </div>
             {error ? (

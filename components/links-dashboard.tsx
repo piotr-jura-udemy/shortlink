@@ -10,13 +10,21 @@ export async function LinksDashboard() {
 
   if (links.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed bg-muted/30 px-6 py-16 text-center">
-        <h2 className="text-lg font-medium tracking-tight">No links yet</h2>
-        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-          Create your first short link to get started. Destination URL in,
-          short path out.
+      <div className="flex flex-col items-start justify-center px-1 py-16 sm:py-24">
+        <span
+          aria-hidden
+          className="font-mono text-7xl leading-none text-primary/25 select-none sm:text-8xl"
+        >
+          /
+        </span>
+        <h2 className="mt-6 font-display text-2xl font-semibold tracking-tight text-foreground">
+          No links yet
+        </h2>
+        <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+          Destination URL in, short path out. Create your first link to start
+          routing.
         </p>
-        <div className="mt-6">
+        <div className="mt-8">
           <CreateLinkDialog label="Create your first link" />
         </div>
       </div>

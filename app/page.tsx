@@ -4,7 +4,7 @@ import { LinksDashboard } from "@/components/links-dashboard";
 
 function DashboardFallback() {
   return (
-    <div className="rounded-xl border bg-card px-6 py-16 text-center text-sm text-muted-foreground">
+    <div className="rounded-lg border border-border bg-card px-6 py-16 text-center text-sm text-muted-foreground">
       Loading links…
     </div>
   );
@@ -12,15 +12,19 @@ function DashboardFallback() {
 
 export default function HomePage() {
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-8 sm:px-6">
-      <header className="mb-8 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">shortlink</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Short links with a simple dashboard.
+    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-10 sm:px-6 sm:py-14">
+      <header className="mb-10 flex items-start justify-between gap-6">
+        <div className="min-w-0">
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+            shortlink
+          </h1>
+          <p className="mt-2 max-w-sm text-sm text-muted-foreground sm:text-base">
+            Compress a URL. Keep the path.
           </p>
         </div>
-        <CreateLinkDialog />
+        <div className="shrink-0 pt-1">
+          <CreateLinkDialog />
+        </div>
       </header>
 
       <Suspense fallback={<DashboardFallback />}>

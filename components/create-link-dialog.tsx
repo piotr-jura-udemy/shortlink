@@ -79,7 +79,7 @@ export function CreateLinkDialog({
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Create a short link</DialogTitle>
+            <DialogTitle className="font-display">Create a short link</DialogTitle>
             <DialogDescription>
               Paste a destination URL. Optionally set a custom slug.
             </DialogDescription>
@@ -104,6 +104,7 @@ export function CreateLinkDialog({
                 placeholder="auto-generate"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
+                className="font-mono"
               />
             </div>
             {error ? (
