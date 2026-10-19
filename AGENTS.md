@@ -7,6 +7,15 @@ Before changing stack, auth, data storage, API style, or other cross-cutting arc
 - Never reuse ADR numbers. Follow `docs/decisions/README.md`.
 - Prefer implementing *within* existing ADRs over inventing a parallel approach.
 
+# Product & UI design
+
+When UI or UX needs to be changed or decided, read `DESIGN.md`.
+
+- Follow whatever is recorded there. Do not invent parallel “house style” docs or drive-by conventions that imply new product decisions.
+- Gaps mean **not decided yet** — implement the task at hand without pretending a convention exists, and do not backfill `DESIGN.md` without agreement.
+- To record a new convention: propose it, get explicit agreement that it should become the current decision, update `DESIGN.md`, then implement.
+- Stack, auth, and storage still go through ADRs. If a design change implies architecture, ADR first (or alongside).
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

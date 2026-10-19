@@ -4,6 +4,8 @@ ADRs in this directory capture **important, durable decisions** for shortlink.
 
 They exist so humans and agents share the same rationale, and so those choices are **not casually reversed** during day-to-day coding.
 
+**Boundary:** ADRs cover architecture and stack. Product and UX conventions live in [`DESIGN.md`](../../DESIGN.md) and follow its change-control rules. Early prototype may leave `DESIGN.md` mostly empty of conventions.
+
 ## Rules
 
 1. **Read before changing architecture.** Check this folder when touching stack, auth, data storage, API style, or similar cross-cutting concerns.
