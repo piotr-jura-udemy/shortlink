@@ -3,7 +3,16 @@ import { drizzle } from "drizzle-orm/libsql";
 import path from "node:path";
 import * as schema from "./schema";
 
-const dbPath = path.join(process.cwd(), "sqlite.db");
+function resolveDbPath(): string {
+  if (process.env.SQLITE_PATH) {
+    return path.isAbsolute(process.env.SQLITE_PATH)
+      ? process.env.SQLITE_PATH
+      : path.join(process.cwd(), process.env.SQLITE_PATH);
+  }
+  return path.join(process.cwd(), "sqlite.db");
+}
+
+const dbPath = resolveDbPath();
 
 const client = createClient({
   url: `file:${dbPath}`,
