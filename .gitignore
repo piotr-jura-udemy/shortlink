@@ -21,9 +21,9 @@ e2e.sqlite.db-*
 *.vitest.sqlite.db
 *.vitest.sqlite.db-*
 
-# next.js
+# next.js (default .next plus any NEXT_DIST_DIR overrides like .next-e2e)
 /.next/
-/.next-e2e/
+/.next-*/
 /out/
 
 # production
