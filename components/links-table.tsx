@@ -2,15 +2,15 @@
 
 import { useState, useTransition } from "react";
 import {
-  CopyIcon,
-  CheckIcon,
   MoreHorizontalIcon,
   PencilIcon,
   Trash2Icon,
 } from "lucide-react";
 import { deleteLink } from "@/lib/links";
 import type { SerializedLink } from "@/lib/serialize";
+import { CopyShortLinkButton } from "@/components/copy-short-link-button";
 import { EditLinkDialog } from "@/components/edit-link-dialog";
+import { QrCodeButton } from "@/components/qr-code-dialog";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -44,45 +44,6 @@ function formatDate(iso: string) {
     year: "numeric",
     timeZone: "UTC",
   }).format(new Date(iso));
-}
-
-function CopyButton({ slug }: { slug: string }) {
-  const [copied, setCopied] = useState(false);
-  const [flashing, setFlashing] = useState(false);
-
-  async function handleCopy() {
-    const value = `${window.location.origin}/${slug}`;
-    await navigator.clipboard.writeText(value);
-    setFlashing(true);
-    window.setTimeout(() => {
-      setCopied(true);
-      setFlashing(false);
-    }, 80);
-    window.setTimeout(() => setCopied(false), 1500);
-  }
-
-  return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon-sm"
-      onClick={handleCopy}
-      aria-label={copied ? "Copied" : "Copy short link"}
-      className="text-muted-foreground"
-    >
-      <span
-        className={`inline-flex transition-[opacity,filter] duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${
-          flashing ? "opacity-70 blur-[2px]" : "opacity-100 blur-0"
-        }`}
-      >
-        {copied ? (
-          <CheckIcon className="text-primary" />
-        ) : (
-          <CopyIcon />
-        )}
-      </span>
-    </Button>
-  );
 }
 
 export function LinksTable({ links }: { links: SerializedLink[] }) {
@@ -129,7 +90,8 @@ export function LinksTable({ links }: { links: SerializedLink[] }) {
                       >
                         {shortPath}
                       </a>
-                      <CopyButton slug={link.slug} />
+                      <CopyShortLinkButton slug={link.slug} />
+                      <QrCodeButton slug={link.slug} />
                     </div>
                   </TableCell>
                   <TableCell className="hidden max-w-xs truncate text-muted-foreground md:table-cell">
