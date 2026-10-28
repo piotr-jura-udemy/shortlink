@@ -29,6 +29,7 @@ export default defineConfig({
     timeout: 120_000,
     env: {
       ...process.env,
+      CI: process.env.CI ?? "true",
       SQLITE_PATH: e2eDbPath,
       NEXT_DIST_DIR: ".next-e2e",
     },
