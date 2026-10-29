@@ -5,8 +5,8 @@ import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { QrCodeDialog } from "./qr-code-dialog";
 
-vi.mock("qrcode.react", () => {
-  const { forwardRef } = require("react") as typeof import("react");
+vi.mock("qrcode.react", async () => {
+  const { forwardRef } = await import("react");
   return {
     QRCodeCanvas: forwardRef<
       HTMLCanvasElement,

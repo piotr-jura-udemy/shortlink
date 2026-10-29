@@ -10,10 +10,12 @@ export function LinksSearch({ defaultQuery }: { defaultQuery: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const [value, setValue] = useState(defaultQuery);
+  const [prevDefaultQuery, setPrevDefaultQuery] = useState(defaultQuery);
 
-  useEffect(() => {
+  if (defaultQuery !== prevDefaultQuery) {
+    setPrevDefaultQuery(defaultQuery);
     setValue(defaultQuery);
-  }, [defaultQuery]);
+  }
 
   useEffect(() => {
     const trimmed = value.trim();
