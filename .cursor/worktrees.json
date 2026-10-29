@@ -1,0 +1,6 @@
+{
+  "setup-worktree-unix": "setup-worktree-unix.sh",
+  "setup-worktree": [
+    "echo 'Define setup-worktree-unix (or run .cursor/setup-worktree-unix.sh) for this OS.'"
+  ]
+}
