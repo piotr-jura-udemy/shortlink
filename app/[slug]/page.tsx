@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { MissingLinkView } from "@/components/missing-link/missing-link-view";
 import { getLinkBySlug, incrementClicks } from "@/lib/links";
@@ -26,6 +27,7 @@ export async function generateMetadata({
 }
 
 export default async function ShortLinkPage({ params }: ShortLinkPageProps) {
+  await connection();
   const { slug } = await params;
 
   const link = await getLinkBySlug(slug);

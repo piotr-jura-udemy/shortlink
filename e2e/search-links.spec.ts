@@ -12,7 +12,10 @@ test("search by slug filters the links table", async ({ page }) => {
     [matchSlug, "/match"],
     [otherSlug, "/other"],
   ] as const) {
-    await page.getByRole("button", { name: "Create link", exact: true }).click();
+    await page
+      .getByRole("banner")
+      .getByRole("button", { name: "Create link", exact: true })
+      .click();
     const dialog = page.getByRole("dialog");
     await expect(
       dialog.getByRole("heading", { name: "Create a short link" }),
@@ -24,6 +27,7 @@ test("search by slug filters the links table", async ({ page }) => {
       dialog.getByRole("heading", { name: "Link created" }),
     ).toBeVisible();
     await dialog.getByRole("button", { name: "Done" }).click();
+    await expect(dialog).toBeHidden();
     await expect(page.getByRole("link", { name: `/${slug}` })).toBeVisible();
   }
 
