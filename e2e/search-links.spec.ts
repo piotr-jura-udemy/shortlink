@@ -20,8 +20,11 @@ test("search by slug filters the links table", async ({ page }) => {
     await dialog.locator("#create-url").fill(`https://example.com${path}`);
     await dialog.locator("#create-slug").fill(slug);
     await dialog.getByRole("button", { name: "Create link" }).click();
+    await expect(
+      dialog.getByRole("heading", { name: "Link created" }),
+    ).toBeVisible();
+    await dialog.getByRole("button", { name: "Done" }).click();
     await expect(page.getByRole("link", { name: `/${slug}` })).toBeVisible();
-    await expect(dialog).toBeHidden();
   }
 
   const search = page.getByRole("searchbox", { name: "Search links" });

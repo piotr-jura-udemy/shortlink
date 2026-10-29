@@ -90,6 +90,7 @@ export async function createLink(input: unknown): Promise<ActionResult> {
 
   const created = await db.select().from(links).where(eq(links.id, id)).limit(1);
   revalidatePath("/");
+  revalidatePath("/app");
   return { success: true, link: created[0]! };
 }
 
@@ -128,6 +129,7 @@ export async function updateLink(input: unknown): Promise<ActionResult> {
 
   const updated = await db.select().from(links).where(eq(links.id, id)).limit(1);
   revalidatePath("/");
+  revalidatePath("/app");
   return { success: true, link: updated[0]! };
 }
 
@@ -140,6 +142,7 @@ export async function deleteLink(
 
   await db.delete(links).where(eq(links.id, id));
   revalidatePath("/");
+  revalidatePath("/app");
   return { success: true };
 }
 
