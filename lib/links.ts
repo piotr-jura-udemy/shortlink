@@ -1,6 +1,6 @@
 "use server";
 
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, or, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { db } from "./db";
@@ -11,12 +11,36 @@ export type ActionResult =
   | { success: true; link: Link }
   | { success: false; error: string };
 
+export type GetLinksOptions = {
+  query?: string;
+};
+
 function generateSlug(): string {
   return nanoid(7);
 }
 
-export async function getLinks(): Promise<Link[]> {
-  return db.select().from(links).orderBy(desc(links.createdAt));
+/** Escape `\`, `%`, and `_` so user input is matched literally in LIKE patterns. */
+function escapeLikePattern(raw: string): string {
+  return raw.replace(/[\\%_]/g, (ch) => `\\${ch}`);
+}
+
+export async function getLinks(options?: GetLinksOptions): Promise<Link[]> {
+  const query = options?.query?.trim();
+  if (!query) {
+    return db.select().from(links).orderBy(desc(links.createdAt));
+  }
+
+  const pattern = `%${escapeLikePattern(query)}%`;
+  return db
+    .select()
+    .from(links)
+    .where(
+      or(
+        sql`${links.slug} LIKE ${pattern} ESCAPE '\\'`,
+        sql`${links.url} LIKE ${pattern} ESCAPE '\\'`,
+      ),
+    )
+    .orderBy(desc(links.createdAt));
 }
 
 export async function getLinkBySlug(slug: string): Promise<Link | undefined> {

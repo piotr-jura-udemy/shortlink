@@ -11,7 +11,11 @@ function DashboardFallback() {
   );
 }
 
-export default function AppPage() {
+export default function AppPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string | string[] }>;
+}) {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-10 flex items-start justify-between gap-6">
@@ -34,7 +38,7 @@ export default function AppPage() {
       </header>
 
       <Suspense fallback={<DashboardFallback />}>
-        <LinksDashboard />
+        <LinksDashboard searchParams={searchParams} />
       </Suspense>
     </div>
   );
