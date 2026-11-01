@@ -28,7 +28,7 @@ test("create a short link and redirect to the destination", async ({
     dialog.getByRole("heading", { name: "Create a short link" }),
   ).toBeVisible();
 
-  const secondSlug = `${slug}-2`;
+  const secondSlug = `next-${Date.now().toString(36)}`;
   await dialog.locator("#create-url").fill("https://example.com/second");
   await dialog.locator("#create-slug").fill(secondSlug);
   await dialog.getByRole("button", { name: "Create link" }).click();
