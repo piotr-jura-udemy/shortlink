@@ -118,6 +118,9 @@ export function CreateLinkDialog({
                 </Button>
               </div>
               <DialogFooter className="mt-4">
+                <Button type="button" variant="outline" onClick={resetForm}>
+                  Create another
+                </Button>
                 <Button
                   type="button"
                   onClick={() => {
