@@ -22,8 +22,23 @@ test("create a short link and redirect to the destination", async ({
   await expect(
     dialog.getByRole("heading", { name: "Link created" }),
   ).toBeVisible();
+
+  await dialog.getByRole("button", { name: "Create another" }).click();
+  await expect(
+    dialog.getByRole("heading", { name: "Create a short link" }),
+  ).toBeVisible();
+
+  const secondSlug = `${slug}-2`;
+  await dialog.locator("#create-url").fill("https://example.com/second");
+  await dialog.locator("#create-slug").fill(secondSlug);
+  await dialog.getByRole("button", { name: "Create link" }).click();
+  await expect(
+    dialog.getByRole("heading", { name: "Link created" }),
+  ).toBeVisible();
+
   await dialog.getByRole("button", { name: "Done" }).click();
   await expect(page.getByRole("link", { name: `/${slug}` })).toBeVisible();
+  await expect(page.getByRole("link", { name: `/${secondSlug}` })).toBeVisible();
 
   const response = await page.goto(`/${slug}`, {
     waitUntil: "domcontentloaded",
