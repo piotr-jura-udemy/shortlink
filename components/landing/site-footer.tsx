@@ -12,8 +12,8 @@ export function SiteFooter() {
               shortlink
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              A single-operator URL shortener. Create short paths, track clicks,
-              and keep destinations editable.
+              A multi-user URL shortener. Create short paths, track clicks, and
+              keep destinations editable in your workspace.
             </p>
           </div>
 
@@ -23,10 +23,18 @@ export function SiteFooter() {
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li>
                   <Link
-                    href="/app"
+                    href="/signup"
                     className="transition-colors duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-foreground"
                   >
-                    Open app
+                    Sign up
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/login"
+                    className="transition-colors duration-[160ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:text-foreground"
+                  >
+                    Sign in
                   </Link>
                 </li>
                 <li>
@@ -41,10 +49,10 @@ export function SiteFooter() {
             </div>
             <div className="sm:pt-0">
               <Link
-                href="/app"
+                href="/signup"
                 className={cn(buttonVariants({ size: "lg" }), "px-4")}
               >
-                Open app
+                Get started
               </Link>
             </div>
           </div>
@@ -52,7 +60,7 @@ export function SiteFooter() {
 
         <div className="flex flex-col gap-2 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>Compress a URL. Keep the path.</p>
-          <p>No account required.</p>
+          <p>Your links. Your stats.</p>
         </div>
       </div>
     </footer>

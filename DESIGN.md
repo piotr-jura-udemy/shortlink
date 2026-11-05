@@ -10,9 +10,15 @@ Do not add or revise entries unless humans and the agent explicitly agree that t
 
 ## Product
 
-- Single-operator URL shortener: create, list, copy, edit, delete links; track click counts.
-- Two surfaces: marketing landing at `/`, links dashboard at `/app`. No auth — anyone who can reach `/app` can manage links.
-- Stack, storage, and API shape live in [`docs/decisions/`](docs/decisions/), not here.
+- Multi-user URL shortener SaaS: anyone can sign up; create, list, copy, edit, delete links; track click counts for their organization only.
+- Surfaces:
+  - Marketing landing at `/` (public)
+  - Auth at `/login` and `/signup` (public)
+  - Links dashboard at `/app` (authenticated; redirects to `/login` when logged out)
+  - Short redirects at `/[slug]` (public; no public stats)
+- After login or signup, land on `/app`.
+- Each signup gets a default organization; links belong to that organization (invite UI is not part of the product yet).
+- Stack, storage, auth library, and API shape live in [`docs/decisions/`](docs/decisions/), not here.
 
 ## Open
 

@@ -2,14 +2,18 @@ import { expect, test } from "@playwright/test";
 import path from "node:path";
 import fs from "node:fs";
 import os from "node:os";
+import { signUp, uniqueEmail } from "./auth";
 
 test("QR code encodes the short URL and downloads a PNG", async ({
   page,
 }) => {
   const slug = `qr-${Date.now().toString(36)}`;
 
-  await page.goto("/app");
-  await expect(page.getByRole("heading", { name: "shortlink" })).toBeVisible();
+  await signUp(page, {
+    name: "QR User",
+    email: uniqueEmail("qr"),
+    password: "password123",
+  });
 
   await page.getByRole("button", { name: "Create link", exact: true }).click();
   const createDialog = page.getByRole("dialog");

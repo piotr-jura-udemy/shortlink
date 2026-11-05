@@ -11,6 +11,7 @@ describe("serializeLink", () => {
       url: "https://example.com",
       slug: "ex",
       clicks: 3,
+      organizationId: "org_1",
       createdAt,
       updatedAt,
     };
@@ -20,6 +21,7 @@ describe("serializeLink", () => {
       url: "https://example.com",
       slug: "ex",
       clicks: 3,
+      organizationId: "org_1",
       createdAt: "2026-01-15T12:00:00.000Z",
       updatedAt: "2026-01-16T08:30:00.000Z",
     });

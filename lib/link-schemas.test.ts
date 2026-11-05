@@ -20,7 +20,7 @@ describe("slugSchema", () => {
   });
 
   it("rejects reserved slugs", () => {
-    for (const slug of ["api", "app", "APP"]) {
+    for (const slug of ["api", "app", "APP", "login", "signup", "Login"]) {
       const result = slugSchema.safeParse(slug);
       expect(result.success).toBe(false);
       if (!result.success) {

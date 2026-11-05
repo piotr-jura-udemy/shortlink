@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-const RESERVED_SLUGS = new Set(["api", "app", "favicon.ico"]);
+const RESERVED_SLUGS = new Set([
+  "api",
+  "app",
+  "favicon.ico",
+  "login",
+  "signup",
+]);
 
 export const slugSchema = z
   .string()
