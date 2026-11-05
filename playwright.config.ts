@@ -32,6 +32,10 @@ export default defineConfig({
       CI: process.env.CI ?? "true",
       SQLITE_PATH: e2eDbPath,
       NEXT_DIST_DIR: ".next-e2e",
+      BETTER_AUTH_SECRET:
+        process.env.BETTER_AUTH_SECRET ??
+        "e2e-secret-change-me-in-production-32c",
+      BETTER_AUTH_URL: baseURL,
     },
   },
 });

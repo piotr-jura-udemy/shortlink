@@ -1,12 +1,16 @@
 import { expect, test } from "@playwright/test";
+import { signUp, uniqueEmail } from "./auth";
 
 test("search by slug filters the links table", async ({ page }) => {
   const suffix = Date.now().toString(36);
   const matchSlug = `find-me-${suffix}`;
   const otherSlug = `other-${suffix}`;
 
-  await page.goto("/app");
-  await expect(page.getByRole("heading", { name: "shortlink" })).toBeVisible();
+  await signUp(page, {
+    name: "Searcher",
+    email: uniqueEmail("search"),
+    password: "password123",
+  });
 
   for (const [slug, path] of [
     [matchSlug, "/match"],

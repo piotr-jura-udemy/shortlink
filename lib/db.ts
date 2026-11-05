@@ -7,9 +7,9 @@ function resolveDbPath(): string {
   if (process.env.SQLITE_PATH) {
     return path.isAbsolute(process.env.SQLITE_PATH)
       ? process.env.SQLITE_PATH
-      : path.join(process.cwd(), process.env.SQLITE_PATH);
+      : path.join(/*turbopackIgnore: true*/ process.cwd(), process.env.SQLITE_PATH);
   }
-  return path.join(process.cwd(), "sqlite.db");
+  return path.join(/*turbopackIgnore: true*/ process.cwd(), "sqlite.db");
 }
 
 const dbPath = resolveDbPath();

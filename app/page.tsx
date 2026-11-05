@@ -16,12 +16,20 @@ export default function LandingPage() {
         >
           shortlink
         </Link>
-        <Link
-          href="/app"
-          className={cn(buttonVariants({ size: "lg" }), "px-4")}
-        >
-          Open app
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/login"
+            className={cn(buttonVariants({ variant: "outline", size: "lg" }), "px-4")}
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/signup"
+            className={cn(buttonVariants({ size: "lg" }), "px-4")}
+          >
+            Sign up
+          </Link>
+        </div>
       </header>
 
       <main>
@@ -53,7 +61,7 @@ export default function LandingPage() {
             style={{ animationDelay: "180ms" }}
           >
             Create short links, copy them in one click, and track how often they
-            get used — all from a single dashboard.
+            get used — from your private dashboard.
           </p>
 
           <div
@@ -61,10 +69,10 @@ export default function LandingPage() {
             style={{ animationDelay: "240ms" }}
           >
             <Link
-              href="/app"
+              href="/signup"
               className={cn(buttonVariants({ size: "lg" }), "px-5")}
             >
-              Open app
+              Get started
             </Link>
             <a
               href="#how-it-works"
@@ -97,7 +105,7 @@ export default function LandingPage() {
               </h2>
               <p className="mt-3 text-base text-muted-foreground sm:text-lg">
                 shortlink stays small on purpose: create, list, copy, edit,
-                delete, and count clicks. No accounts, no campaigns console.
+                delete, and count clicks — for your workspace only.
               </p>
             </div>
 
@@ -113,14 +121,14 @@ export default function LandingPage() {
               Ready to shorten something?
             </h2>
             <p className="mt-3 max-w-md text-muted-foreground">
-              Jump into the app and create your first link. Anyone with the URL
-              can manage the list — there is no sign-in yet.
+              Create an account, jump into the app, and ship your first short
+              link. Redirects stay public; your stats stay private.
             </p>
             <Link
-              href="/app"
+              href="/signup"
               className={cn(buttonVariants({ size: "lg" }), "mt-8 px-5")}
             >
-              Open app
+              Create account
             </Link>
           </div>
         </section>
