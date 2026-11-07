@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { SessionRecovery } from "@/components/auth/session-recovery";
 import { SignInForm } from "@/components/auth/sign-in-form";
-import { safeNextPath } from "@/lib/safe-next";
+import { decideLoginGate } from "@/lib/auth-gate";
 import { getSession, restoreActiveOrganization } from "@/lib/session";
 
 function firstParam(value: string | string[] | undefined): string | undefined {
@@ -19,18 +19,29 @@ async function LoginContent({
 }) {
   const session = await getSession();
   const params = await searchParams;
-  const next = safeNextPath(firstParam(params.next));
+  const nextParam = firstParam(params.next);
 
-  if (session) {
-    if (session.session.activeOrganizationId) {
-      redirect(next);
-    }
+  let restoredOrganizationId: string | null = null;
+  if (session && !session.session.activeOrganizationId) {
+    restoredOrganizationId = await restoreActiveOrganization(session);
+  }
 
-    const organizationId = await restoreActiveOrganization(session);
-    if (organizationId) {
-      redirect(next);
-    }
+  const decision = decideLoginGate({
+    session: session
+      ? {
+          email: session.user.email,
+          activeOrganizationId: session.session.activeOrganizationId,
+        }
+      : null,
+    nextParam,
+    restoredOrganizationId,
+  });
 
+  if (decision.action === "redirect") {
+    redirect(decision.next);
+  }
+
+  if (decision.action === "show-recovery") {
     return (
       <>
         <div className="mb-8">
@@ -44,7 +55,7 @@ async function LoginContent({
             Sign in
           </h1>
         </div>
-        <SessionRecovery email={session.user.email} />
+        <SessionRecovery email={decision.email} />
       </>
     );
   }
@@ -66,12 +77,12 @@ async function LoginContent({
         </p>
       </div>
 
-      <SignInForm next={next} />
+      <SignInForm next={decision.next} />
 
       <p className="mt-6 text-sm text-muted-foreground">
         No account yet?{" "}
         <Link
-          href={`/signup?next=${encodeURIComponent(next)}`}
+          href={`/signup?next=${encodeURIComponent(decision.next)}`}
           className="font-medium text-foreground underline-offset-4 hover:underline"
         >
           Create one
