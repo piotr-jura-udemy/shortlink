@@ -16,7 +16,7 @@ function slugifyOrg(input: string): string {
   return base.length > 0 ? base : "org";
 }
 
-async function getPersonalOrganizationId(userId: string) {
+export async function getPersonalOrganizationId(userId: string) {
   const rows = await db
     .select({ organizationId: schema.member.organizationId })
     .from(schema.member)
@@ -32,7 +32,7 @@ async function getPersonalOrganizationId(userId: string) {
  * transaction, but the signup session is created inside that transaction —
  * so org creation must be available from `session.create.before`.
  */
-async function ensurePersonalOrganization(user: {
+export async function ensurePersonalOrganization(user: {
   id: string;
   name?: string | null;
   email?: string | null;

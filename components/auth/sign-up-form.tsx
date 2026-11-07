@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { signUpAction } from "@/lib/auth-actions";
+import { safeNextPath } from "@/lib/safe-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +12,7 @@ export function SignUpForm({ next = "/app" }: { next?: string }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const destination = safeNextPath(next);
 
   return (
     <form
@@ -29,7 +31,7 @@ export function SignUpForm({ next = "/app" }: { next?: string }) {
             setError(result.error);
             return;
           }
-          router.push(next.startsWith("/") && !next.startsWith("//") ? next : "/app");
+          router.push(destination);
           router.refresh();
         });
       }}

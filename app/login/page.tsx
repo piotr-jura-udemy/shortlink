@@ -1,18 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { SessionRecovery } from "@/components/auth/session-recovery";
 import { SignInForm } from "@/components/auth/sign-in-form";
-import { getSession } from "@/lib/session";
+import { safeNextPath } from "@/lib/safe-next";
+import { getSession, restoreActiveOrganization } from "@/lib/session";
 
 function firstParam(value: string | string[] | undefined): string | undefined {
   if (typeof value === "string") return value;
   if (Array.isArray(value)) return value[0];
   return undefined;
-}
-
-function safeNext(next: string | undefined): string {
-  if (!next || !next.startsWith("/") || next.startsWith("//")) return "/app";
-  return next;
 }
 
 async function LoginContent({
@@ -22,10 +19,34 @@ async function LoginContent({
 }) {
   const session = await getSession();
   const params = await searchParams;
-  const next = safeNext(firstParam(params.next));
+  const next = safeNextPath(firstParam(params.next));
 
   if (session) {
-    redirect(next);
+    if (session.session.activeOrganizationId) {
+      redirect(next);
+    }
+
+    const organizationId = await restoreActiveOrganization(session);
+    if (organizationId) {
+      redirect(next);
+    }
+
+    return (
+      <>
+        <div className="mb-8">
+          <Link
+            href="/"
+            className="font-display text-2xl font-semibold tracking-tight text-foreground transition-opacity hover:opacity-70"
+          >
+            shortlink
+          </Link>
+          <h1 className="mt-6 text-2xl font-semibold tracking-tight text-foreground">
+            Sign in
+          </h1>
+        </div>
+        <SessionRecovery email={session.user.email} />
+      </>
+    );
   }
 
   return (
