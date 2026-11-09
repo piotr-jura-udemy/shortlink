@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { headers } from "next/headers";
 import {
   auth,
@@ -27,6 +28,35 @@ export async function requireSession(): Promise<Session> {
 }
 
 /**
+ * Per-request dedupe: layout and page data loaders share one restore.
+ * Keyed by userId so distinct Session object identities still coalesce.
+ */
+const restoreByUserId = cache(
+  async (
+    userId: string,
+    name: string,
+    email: string,
+  ): Promise<string | null> => {
+    try {
+      const organizationId = await ensurePersonalOrganization({
+        id: userId,
+        name,
+        email,
+      });
+
+      await auth.api.setActiveOrganization({
+        body: { organizationId },
+        headers: await headers(),
+      });
+
+      return organizationId;
+    } catch {
+      return null;
+    }
+  },
+);
+
+/**
  * If the session has no active organization (e.g. cleared via the org plugin),
  * restore the user's personal org and set it active on the session.
  */
@@ -37,22 +67,11 @@ export async function restoreActiveOrganization(
     return session.session.activeOrganizationId;
   }
 
-  try {
-    const organizationId = await ensurePersonalOrganization({
-      id: session.user.id,
-      name: session.user.name,
-      email: session.user.email,
-    });
-
-    await auth.api.setActiveOrganization({
-      body: { organizationId },
-      headers: await headers(),
-    });
-
-    return organizationId;
-  } catch {
-    return null;
-  }
+  return restoreByUserId(
+    session.user.id,
+    session.user.name,
+    session.user.email,
+  );
 }
 
 export async function requireActiveOrganization(): Promise<{

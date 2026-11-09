@@ -25,52 +25,84 @@ export async function getPersonalOrganizationId(userId: string) {
   return rows[0]?.organizationId ?? null;
 }
 
+/** Deduplicate concurrent ensure calls for the same user (layout + page race). */
+const personalOrgInflight = new Map<string, Promise<string>>();
+
 /**
  * Ensure the user has a personal organization.
  *
  * Better Auth queues `user.create.after` until after the surrounding
  * transaction, but the signup session is created inside that transaction —
  * so org creation must be available from `session.create.before`.
+ *
+ * Concurrent callers (e.g. /app layout + getLinks) share one in-flight promise
+ * per userId, and creation re-checks membership after slug conflicts.
  */
 export async function ensurePersonalOrganization(user: {
   id: string;
   name?: string | null;
   email?: string | null;
-}) {
+}): Promise<string> {
+  const existing = await getPersonalOrganizationId(user.id);
+  if (existing) return existing;
+
+  const inflight = personalOrgInflight.get(user.id);
+  if (inflight) return inflight;
+
+  const createPromise = createPersonalOrganization(user).finally(() => {
+    personalOrgInflight.delete(user.id);
+  });
+  personalOrgInflight.set(user.id, createPromise);
+  return createPromise;
+}
+
+async function createPersonalOrganization(user: {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+}): Promise<string> {
   const existing = await getPersonalOrganizationId(user.id);
   if (existing) return existing;
 
   const baseSlug = slugifyOrg(
     user.name || user.email?.split("@")[0] || "org",
   );
-  let slug = baseSlug;
+  const displayName = user.name?.trim() || "Personal";
+
   for (let attempt = 0; attempt < 8; attempt++) {
-    const conflict = await db
-      .select({ id: schema.organization.id })
-      .from(schema.organization)
-      .where(eq(schema.organization.slug, slug))
-      .limit(1);
-    if (!conflict[0]) break;
-    slug = `${baseSlug}-${nanoid(6)}`;
+    const again = await getPersonalOrganizationId(user.id);
+    if (again) return again;
+
+    const slug =
+      attempt === 0 ? baseSlug : `${baseSlug}-${nanoid(6)}`;
+    const orgId = nanoid();
+    const now = new Date();
+
+    try {
+      await db.insert(schema.organization).values({
+        id: orgId,
+        name: `${displayName}'s workspace`,
+        slug,
+        createdAt: now,
+      });
+      await db.insert(schema.member).values({
+        id: nanoid(),
+        organizationId: orgId,
+        userId: user.id,
+        role: "owner",
+        createdAt: now,
+      });
+      return orgId;
+    } catch {
+      const recovered = await getPersonalOrganizationId(user.id);
+      if (recovered) return recovered;
+      // Slug collision or transient conflict — retry with a new slug.
+    }
   }
 
-  const orgId = nanoid();
-  const now = new Date();
-  const displayName = user.name?.trim() || "Personal";
-  await db.insert(schema.organization).values({
-    id: orgId,
-    name: `${displayName}'s workspace`,
-    slug,
-    createdAt: now,
-  });
-  await db.insert(schema.member).values({
-    id: nanoid(),
-    organizationId: orgId,
-    userId: user.id,
-    role: "owner",
-    createdAt: now,
-  });
-  return orgId;
+  const fallback = await getPersonalOrganizationId(user.id);
+  if (fallback) return fallback;
+  throw new Error("Could not create personal organization");
 }
 
 export const auth = betterAuth({

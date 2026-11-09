@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { MissingLinkView } from "@/components/missing-link/missing-link-view";
-import { getLinkBySlug, incrementClicks } from "@/lib/links";
+import {
+  findPublicLinkBySlug,
+  incrementPublicLinkClicks,
+} from "@/lib/public-links";
 
 /** Redirects and DB lookups must finish before any shell can stream. */
 export const instant = false;
@@ -15,7 +18,7 @@ export async function generateMetadata({
   params,
 }: ShortLinkPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const link = await getLinkBySlug(slug);
+  const link = await findPublicLinkBySlug(slug);
   if (link) {
     return { title: "shortlink" };
   }
@@ -30,11 +33,11 @@ export default async function ShortLinkPage({ params }: ShortLinkPageProps) {
   await connection();
   const { slug } = await params;
 
-  const link = await getLinkBySlug(slug);
+  const link = await findPublicLinkBySlug(slug);
   if (!link) {
     return <MissingLinkView slug={slug} />;
   }
 
-  await incrementClicks(link.id);
+  await incrementPublicLinkClicks(link.id);
   redirect(link.url);
 }

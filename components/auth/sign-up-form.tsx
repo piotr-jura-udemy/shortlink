@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { signUpAction } from "@/lib/auth-actions";
+import { authClient } from "@/lib/auth-client";
+import { signUpSchema } from "@/lib/auth-schemas";
 import { safeNextPath } from "@/lib/safe-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,14 +22,25 @@ export function SignUpForm({ next = "/app" }: { next?: string }) {
         event.preventDefault();
         setError(null);
         const form = new FormData(event.currentTarget);
+        const parsed = signUpSchema.safeParse({
+          name: form.get("name"),
+          email: form.get("email"),
+          password: form.get("password"),
+        });
+        if (!parsed.success) {
+          setError(parsed.error.issues[0]?.message ?? "Invalid input");
+          return;
+        }
+
         startTransition(async () => {
-          const result = await signUpAction({
-            name: form.get("name"),
-            email: form.get("email"),
-            password: form.get("password"),
+          // HTTP client path so Better Auth rate limits on /sign-up/email apply.
+          const { error: signUpError } = await authClient.signUp.email({
+            name: parsed.data.name,
+            email: parsed.data.email,
+            password: parsed.data.password,
           });
-          if (!result.success) {
-            setError(result.error);
+          if (signUpError) {
+            setError(signUpError.message || "Could not create account");
             return;
           }
           router.push(destination);

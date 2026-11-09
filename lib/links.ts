@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { db } from "./db";
 import { createLinkSchema, updateLinkSchema } from "./link-schemas";
+import { slugIsTaken } from "./public-links";
 import { links, type Link } from "./schema";
 import { AuthError, requireActiveOrganization } from "./session";
 
@@ -60,11 +61,6 @@ export async function getLinks(options?: GetLinksOptions): Promise<Link[]> {
     .orderBy(desc(links.createdAt));
 }
 
-export async function getLinkBySlug(slug: string): Promise<Link | undefined> {
-  const rows = await db.select().from(links).where(eq(links.slug, slug)).limit(1);
-  return rows[0];
-}
-
 export async function createLink(input: unknown): Promise<ActionResult> {
   let organizationId: string;
   try {
@@ -85,15 +81,14 @@ export async function createLink(input: unknown): Promise<ActionResult> {
   let slug = parsed.data.slug ?? generateSlug();
 
   for (let attempt = 0; attempt < 5; attempt++) {
-    const existing = await getLinkBySlug(slug);
-    if (!existing) break;
+    if (!(await slugIsTaken(slug))) break;
     if (parsed.data.slug) {
       return { success: false, error: "This slug is already taken" };
     }
     slug = generateSlug();
   }
 
-  if (await getLinkBySlug(slug)) {
+  if (await slugIsTaken(slug)) {
     return {
       success: false,
       error: "Could not generate a unique slug. Try again.",
@@ -148,8 +143,7 @@ export async function updateLink(input: unknown): Promise<ActionResult> {
   }
 
   if (slug !== existing.slug) {
-    const conflict = await getLinkBySlug(slug);
-    if (conflict) {
+    if (await slugIsTaken(slug)) {
       return { success: false, error: "This slug is already taken" };
     }
   }
@@ -197,15 +191,4 @@ export async function deleteLink(
   revalidatePath("/");
   revalidatePath("/app");
   return { success: true };
-}
-
-export async function incrementClicks(id: string): Promise<void> {
-  const rows = await db.select().from(links).where(eq(links.id, id)).limit(1);
-  const link = rows[0];
-  if (!link) return;
-
-  await db
-    .update(links)
-    .set({ clicks: link.clicks + 1 })
-    .where(eq(links.id, id));
 }

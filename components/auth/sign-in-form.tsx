@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { signInAction } from "@/lib/auth-actions";
+import { authClient } from "@/lib/auth-client";
+import { signInSchema } from "@/lib/auth-schemas";
 import { safeNextPath } from "@/lib/safe-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,13 +22,23 @@ export function SignInForm({ next = "/app" }: { next?: string }) {
         event.preventDefault();
         setError(null);
         const form = new FormData(event.currentTarget);
+        const parsed = signInSchema.safeParse({
+          email: form.get("email"),
+          password: form.get("password"),
+        });
+        if (!parsed.success) {
+          setError(parsed.error.issues[0]?.message ?? "Invalid input");
+          return;
+        }
+
         startTransition(async () => {
-          const result = await signInAction({
-            email: form.get("email"),
-            password: form.get("password"),
+          // HTTP client path so Better Auth rate limits on /sign-in/email apply.
+          const { error: signInError } = await authClient.signIn.email({
+            email: parsed.data.email,
+            password: parsed.data.password,
           });
-          if (!result.success) {
-            setError(result.error);
+          if (signInError) {
+            setError(signInError.message || "Invalid email or password");
             return;
           }
           router.push(destination);
