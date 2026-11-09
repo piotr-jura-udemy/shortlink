@@ -1,4 +1,21 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, type BrowserContext, type Page } from "@playwright/test";
+
+const clientIps = new WeakMap<BrowserContext, string>();
+let nextClientIp = 1;
+
+/**
+ * Give each browser context its own client IP (via the trusted header set in
+ * playwright.config.ts) so the suite is not one client sharing the per-IP
+ * auth rate limits — retries would otherwise exhaust them.
+ */
+async function assignClientIp(page: Page) {
+  const context = page.context();
+  if (clientIps.has(context)) return;
+  const n = nextClientIp++;
+  const ip = `198.18.${Math.floor(n / 250)}.${(n % 250) + 1}`;
+  clientIps.set(context, ip);
+  await context.setExtraHTTPHeaders({ "x-e2e-client-ip": ip });
+}
 
 export async function signUp(
   page: Page,
@@ -12,6 +29,7 @@ export async function signUp(
     password: string;
   },
 ) {
+  await assignClientIp(page);
   await page.goto("/signup");
   await page.locator("#name").fill(name);
   await page.locator("#email").fill(email);
@@ -31,6 +49,7 @@ export async function signIn(
     password: string;
   },
 ) {
+  await assignClientIp(page);
   await page.goto("/login");
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(password);

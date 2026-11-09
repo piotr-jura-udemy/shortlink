@@ -20,7 +20,7 @@ npm run db:seed
 npm run dev
 ```
 
-In production, run behind a reverse proxy and set `BETTER_AUTH_IP_HEADERS` or `BETTER_AUTH_TRUSTED_PROXIES` (see `.env.example`) so auth rate limits use the real client IP instead of a spoofable `X-Forwarded-For`.
+In production, run behind a reverse proxy and set `BETTER_AUTH_IP_HEADERS` or `BETTER_AUTH_TRUSTED_PROXIES` (see `.env.example`) so auth rate limits use the real client IP. Without either, production trusts no client-supplied IP header and all visitors share one sign-in/sign-up rate-limit bucket.
 
 Open [http://localhost:3000](http://localhost:3000).
 

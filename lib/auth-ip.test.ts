@@ -9,8 +9,25 @@ function resolve(env: Record<string, string | undefined>, headers: HeadersInit) 
 }
 
 describe("ipAddressOptionsFromEnv", () => {
-  it("returns no overrides when nothing is configured", () => {
+  it("returns no overrides when nothing is configured outside production", () => {
     expect(ipAddressOptionsFromEnv({})).toEqual({});
+    expect(ipAddressOptionsFromEnv({ NODE_ENV: "development" })).toEqual({});
+  });
+
+  it("does not trust a client-supplied X-Forwarded-For in unconfigured production", () => {
+    const ip = resolve(
+      { NODE_ENV: "production" },
+      { "x-forwarded-for": "203.0.113.9" },
+    );
+    expect(ip).not.toBe("203.0.113.9");
+  });
+
+  it("still honors explicit configuration in production", () => {
+    const ip = resolve(
+      { NODE_ENV: "production", BETTER_AUTH_IP_HEADERS: "x-real-ip" },
+      { "x-real-ip": "198.51.100.4" },
+    );
+    expect(ip).toBe("198.51.100.4");
   });
 
   it("reads the client IP only from the configured proxy header", () => {
