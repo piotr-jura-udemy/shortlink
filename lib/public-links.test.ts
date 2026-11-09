@@ -7,6 +7,7 @@ import type { db as Db } from "./db";
 import type { links as LinksTable, organization as OrganizationTable } from "./schema";
 import type {
   findPublicLinkBySlug as FindPublicLinkBySlug,
+  incrementPublicLinkClicks as IncrementPublicLinkClicks,
 } from "./public-links";
 
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "shortlink-public-"));
@@ -15,6 +16,7 @@ const orgId = "org-public";
 
 describe("findPublicLinkBySlug", () => {
   let findPublicLinkBySlug: typeof FindPublicLinkBySlug;
+  let incrementPublicLinkClicks: typeof IncrementPublicLinkClicks;
   let db: typeof Db;
   let links: typeof LinksTable;
   let organization: typeof OrganizationTable;
@@ -32,7 +34,9 @@ describe("findPublicLinkBySlug", () => {
     });
     ({ db } = await import("./db"));
     ({ links, organization } = await import("./schema"));
-    ({ findPublicLinkBySlug } = await import("./public-links"));
+    ({ findPublicLinkBySlug, incrementPublicLinkClicks } = await import(
+      "./public-links"
+    ));
 
     await db.insert(organization).values({
       id: orgId,
@@ -70,5 +74,25 @@ describe("findPublicLinkBySlug", () => {
     });
     expect(result).not.toHaveProperty("clicks");
     expect(result).not.toHaveProperty("organizationId");
+  });
+
+  it("counts every click when redirects happen concurrently", async () => {
+    const now = new Date();
+    await db.insert(links).values({
+      id: "link-busy",
+      url: "https://example.com/busy",
+      slug: "busy",
+      clicks: 0,
+      organizationId: orgId,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    await Promise.all(
+      Array.from({ length: 20 }, () => incrementPublicLinkClicks("link-busy")),
+    );
+
+    const rows = await db.select().from(links);
+    expect(rows[0]?.clicks).toBe(20);
   });
 });

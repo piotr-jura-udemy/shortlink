@@ -15,6 +15,13 @@
       "when": 1793817235400,
       "tag": "0001_auth-org-ownership",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794247020336,
+      "tag": "0002_sign-in-throttle",
+      "breakpoints": true
     }
   ]
 }

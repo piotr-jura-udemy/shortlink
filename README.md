@@ -20,6 +20,8 @@ npm run db:seed
 npm run dev
 ```
 
+In production, run behind a reverse proxy and set `BETTER_AUTH_IP_HEADERS` or `BETTER_AUTH_TRUSTED_PROXIES` (see `.env.example`) so auth rate limits use the real client IP instead of a spoofable `X-Forwarded-For`.
+
 Open [http://localhost:3000](http://localhost:3000).
 
 `npm run db:seed` creates two demo users (see script output for passwords), default orgs, and sample links split across them. Pass `--force` to replace existing rows.

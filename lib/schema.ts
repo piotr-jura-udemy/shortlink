@@ -20,5 +20,12 @@ export const links = sqliteTable("links", {
     .$onUpdateFn(() => new Date()),
 });
 
+/** Per-account sign-in attempt counter (keyed by normalized email, not IP). */
+export const signInAttempt = sqliteTable("sign_in_attempt", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  windowStart: integer("window_start").notNull(),
+});
+
 export type Link = typeof links.$inferSelect;
 export type NewLink = typeof links.$inferInsert;

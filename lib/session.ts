@@ -1,10 +1,13 @@
 import { cache } from "react";
+import { and, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import {
   auth,
   ensurePersonalOrganization,
   type Session,
 } from "./auth";
+import { db } from "./db";
+import { member } from "./schema";
 
 export class AuthError extends Error {
   constructor(message = "Unauthorized") {
@@ -56,15 +59,28 @@ const restoreByUserId = cache(
   },
 );
 
+async function isMember(userId: string, organizationId: string) {
+  const rows = await db
+    .select({ id: member.id })
+    .from(member)
+    .where(
+      and(eq(member.userId, userId), eq(member.organizationId, organizationId)),
+    )
+    .limit(1);
+  return Boolean(rows[0]);
+}
+
 /**
- * If the session has no active organization (e.g. cleared via the org plugin),
- * restore the user's personal org and set it active on the session.
+ * Return the session's active organization only if the user is still a
+ * member of it. Otherwise (missing, or membership revoked while the session
+ * lived on) restore the user's personal org and set it active on the session.
  */
 export async function restoreActiveOrganization(
   session: Session,
 ): Promise<string | null> {
-  if (session.session.activeOrganizationId) {
-    return session.session.activeOrganizationId;
+  const active = session.session.activeOrganizationId;
+  if (active && (await isMember(session.user.id, active))) {
+    return active;
   }
 
   return restoreByUserId(
@@ -79,10 +95,7 @@ export async function requireActiveOrganization(): Promise<{
   organizationId: string;
 }> {
   const session = await requireSession();
-  let organizationId = session.session.activeOrganizationId ?? null;
-  if (!organizationId) {
-    organizationId = await restoreActiveOrganization(session);
-  }
+  const organizationId = await restoreActiveOrganization(session);
   if (!organizationId) {
     throw new AuthError("No active organization");
   }

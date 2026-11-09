@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "./db";
 import { links } from "./schema";
 
@@ -25,17 +25,9 @@ export async function findPublicLinkBySlug(
 }
 
 export async function incrementPublicLinkClicks(id: string): Promise<void> {
-  const rows = await db
-    .select({ id: links.id, clicks: links.clicks })
-    .from(links)
-    .where(eq(links.id, id))
-    .limit(1);
-  const link = rows[0];
-  if (!link) return;
-
   await db
     .update(links)
-    .set({ clicks: link.clicks + 1 })
+    .set({ clicks: sql`${links.clicks} + 1` })
     .where(eq(links.id, id));
 }
 

@@ -8,12 +8,10 @@ async function RequireAuth({ children }: { children: React.ReactNode }) {
     redirect("/login?next=/app");
   }
 
-  if (!session.session.activeOrganizationId) {
-    const organizationId = await restoreActiveOrganization(session);
-    if (!organizationId) {
-      // Login shows sign-out recovery instead of bouncing back here.
-      redirect("/login?next=/app");
-    }
+  const organizationId = await restoreActiveOrganization(session);
+  if (!organizationId) {
+    // Login shows sign-out recovery instead of bouncing back here.
+    redirect("/login?next=/app");
   }
 
   return children;

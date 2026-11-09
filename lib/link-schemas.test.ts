@@ -68,6 +68,24 @@ describe("createLinkSchema", () => {
     }
   });
 
+  it("rejects non-http(s) URL schemes", () => {
+    for (const url of [
+      "javascript:alert(1)",
+      "data:text/html,<script>alert(1)</script>",
+      "file:///etc/passwd",
+      "vbscript:msgbox(1)",
+      "ftp://example.com/file",
+    ]) {
+      expect(createLinkSchema.safeParse({ url }).success, url).toBe(false);
+    }
+  });
+
+  it("accepts http and https URLs", () => {
+    for (const url of ["http://example.com", "https://example.com/a?b=c"]) {
+      expect(createLinkSchema.safeParse({ url }).success, url).toBe(true);
+    }
+  });
+
   it("accepts an optional custom slug", () => {
     const result = createLinkSchema.safeParse({
       url: "https://example.com",
@@ -88,6 +106,15 @@ describe("updateLinkSchema", () => {
       slug: "docs",
     });
     expect(result.success).toBe(true);
+  });
+
+  it("rejects non-http(s) URL schemes", () => {
+    const result = updateLinkSchema.safeParse({
+      id: "abc",
+      url: "javascript:alert(document.cookie)",
+      slug: "docs",
+    });
+    expect(result.success).toBe(false);
   });
 
   it("rejects missing id", () => {

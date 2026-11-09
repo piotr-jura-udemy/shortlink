@@ -21,20 +21,16 @@ async function LoginContent({
   const params = await searchParams;
   const nextParam = firstParam(params.next);
 
-  let restoredOrganizationId: string | null = null;
-  if (session && !session.session.activeOrganizationId) {
-    restoredOrganizationId = await restoreActiveOrganization(session);
-  }
+  const organizationId = session
+    ? await restoreActiveOrganization(session)
+    : null;
 
   const decision = decideLoginGate({
     session: session
-      ? {
-          email: session.user.email,
-          activeOrganizationId: session.session.activeOrganizationId,
-        }
+      ? { email: session.user.email, activeOrganizationId: organizationId }
       : null,
     nextParam,
-    restoredOrganizationId,
+    restoredOrganizationId: organizationId,
   });
 
   if (decision.action === "redirect") {

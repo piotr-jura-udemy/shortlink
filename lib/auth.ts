@@ -1,11 +1,31 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { organization } from "better-auth/plugins";
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { ipAddressOptionsFromEnv } from "./auth-ip";
 import { db } from "./db";
 import * as schema from "./schema";
+import { consumeSignInAttempt } from "./sign-in-throttle";
+
+/**
+ * Invites are out of scope (ADR 0003) and there is no email verification, so
+ * anyone could register an invited address and accept. Keep these off the
+ * HTTP surface until an invite flow is designed.
+ */
+const DISABLED_ORGANIZATION_PATHS = [
+  "/organization/invite-member",
+  "/organization/accept-invitation",
+  "/organization/reject-invitation",
+  "/organization/cancel-invitation",
+  "/organization/get-invitation",
+  "/organization/list-invitations",
+  "/organization/list-user-invitations",
+  "/organization/remove-member",
+  "/organization/update-member-role",
+];
 
 function slugifyOrg(input: string): string {
   const base = input
@@ -119,6 +139,22 @@ export const auth = betterAuth({
     minPasswordLength: 8,
     maxPasswordLength: 128,
     autoSignIn: true,
+  },
+  disabledPaths: DISABLED_ORGANIZATION_PATHS,
+  advanced: {
+    ipAddress: ipAddressOptionsFromEnv(),
+  },
+  hooks: {
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== "/sign-in/email") return;
+      const email: unknown = ctx.body?.email;
+      if (typeof email !== "string") return;
+      if (!(await consumeSignInAttempt(email))) {
+        throw new APIError("TOO_MANY_REQUESTS", {
+          message: "Too many sign-in attempts. Try again later.",
+        });
+      }
+    }),
   },
   rateLimit: {
     enabled: true,
