@@ -1,6 +1,6 @@
 # 0001. Next.js App Router shortener with local SQLite and no auth
 
-- Status: Accepted
+- Status: Accepted (Auth row superseded by [0003](./0003-better-auth-org-ownership.md))
 - Date: 2026-10-14
 - Deciders: Project maintainers
 - Commit: `ffbb6e3` (initial shortlink implementation)
@@ -35,7 +35,7 @@ Build **shortlink** as a single Next.js 16 App Router application with this stac
 | Schema / migrations | Drizzle schema in `lib/schema.ts`, SQL migrations in `drizzle/` |
 | Validation | Zod schemas in `lib/link-schemas.ts` on the server |
 | UI | Tailwind CSS + shadcn/ui (Base UI / owned components under `components/ui/`) |
-| Auth | **None** — anyone who can reach the app can manage links |
+| Auth | **None** — anyone who can reach the app can manage links *(superseded by [0003](./0003-better-auth-org-ownership.md))* |
 
 Supporting conventions fixed by this decision:
 
@@ -55,7 +55,7 @@ Supporting conventions fixed by this decision:
 
 ### Negative / constraints
 
-- **No auth is intentional.** Do not add accounts, middleware gates, or multi-tenant isolation without a superseding ADR.
+- **No auth was intentional for v1.** Accounts, org ownership, and dashboard gates are defined in [ADR 0003](./0003-better-auth-org-ownership.md).
 - **Local SQLite assumes a single writable filesystem.** Serverless multi-instance hosts and ephemeral disks are a poor fit without changing the data store (new ADR).
 - **Server Actions couple UI to Next.** A public HTTP API for third parties is out of scope until decided separately.
 - **Open redirect risk is inherent** to a shortener: stored destinations are redirected from this origin. Treat abuse controls as a later product decision, not something to “quietly” redesign the stack around.
@@ -63,7 +63,7 @@ Supporting conventions fixed by this decision:
 
 ### Guidance for humans and agents
 
-Treat the table in **Decision** as binding. Refactors that preserve these choices are fine. Replacing Next.js, introducing auth, swapping SQLite for another primary store, or adding a parallel public API **requires a new ADR** that supersedes this one (or a focused ADR for that slice) before implementation.
+Treat the table in **Decision** as binding except where a later ADR supersedes a row (auth → 0003). Refactors that preserve these choices are fine. Replacing Next.js, swapping SQLite for another primary store, or adding a parallel public API **requires a new ADR** that supersedes this one (or a focused ADR for that slice) before implementation.
 
 ## Alternatives considered
 

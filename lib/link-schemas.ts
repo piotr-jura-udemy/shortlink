@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-const RESERVED_SLUGS = new Set(["api", "app", "favicon.ico"]);
+const RESERVED_SLUGS = new Set([
+  "api",
+  "app",
+  "favicon.ico",
+  "login",
+  "signup",
+]);
 
 export const slugSchema = z
   .string()
@@ -15,8 +21,13 @@ export const slugSchema = z
     message: "This slug is reserved",
   });
 
+const destinationUrlSchema = z.url({
+  protocol: /^https?$/,
+  error: "Enter a valid http(s) URL",
+});
+
 export const createLinkSchema = z.object({
-  url: z.url("Enter a valid URL"),
+  url: destinationUrlSchema,
   slug: z
     .string()
     .trim()
@@ -27,6 +38,6 @@ export const createLinkSchema = z.object({
 
 export const updateLinkSchema = z.object({
   id: z.string().min(1),
-  url: z.url("Enter a valid URL"),
+  url: destinationUrlSchema,
   slug: slugSchema,
 });

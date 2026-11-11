@@ -33,6 +33,7 @@ describe("CreateLinkDialog", () => {
         url: "https://example.com",
         slug: "demo",
         clicks: 0,
+        organizationId: "org_1",
         createdAt: new Date(),
         updatedAt: new Date(),
       },

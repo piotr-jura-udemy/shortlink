@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { signUp, uniqueEmail } from "./auth";
 
 test("create a short link and redirect to the destination", async ({
   page,
@@ -6,8 +7,11 @@ test("create a short link and redirect to the destination", async ({
   const slug = `e2e-${Date.now().toString(36)}`;
   const destination = "https://example.com/";
 
-  await page.goto("/app");
-  await expect(page.getByRole("heading", { name: "shortlink" })).toBeVisible();
+  await signUp(page, {
+    name: "Creator",
+    email: uniqueEmail("creator"),
+    password: "password123",
+  });
 
   await page.getByRole("button", { name: "Create link", exact: true }).click();
   const dialog = page.getByRole("dialog");

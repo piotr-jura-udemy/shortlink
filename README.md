@@ -1,10 +1,11 @@
 # shortlink
 
-A simple Dub-inspired URL shortener. No auth — create, edit, delete short links and track clicks.
+A Dub-inspired URL shortener with email/password accounts. Each signup gets a default organization; links and click stats stay private to that workspace. Public short-link redirects stay public.
 
 ## Stack
 
 - Next.js 16 (App Router)
+- Better Auth (email/password + organization plugin)
 - Tailwind CSS + shadcn/ui
 - Drizzle ORM + SQLite (`@libsql/client`)
 - Zod
@@ -13,18 +14,21 @@ A simple Dub-inspired URL shortener. No auth — create, edit, delete short link
 
 ```bash
 npm install
+cp .env.example .env.local   # set BETTER_AUTH_SECRET and BETTER_AUTH_URL
 npm run db:migrate
 npm run db:seed
 npm run dev
 ```
 
+In production, run behind a reverse proxy and set `BETTER_AUTH_IP_HEADERS` or `BETTER_AUTH_TRUSTED_PROXIES` (see `.env.example`) so auth rate limits use the real client IP. Without either, production trusts no client-supplied IP header and all visitors share one sign-in/sign-up rate-limit bucket.
+
 Open [http://localhost:3000](http://localhost:3000).
 
-`npm run db:seed` loads a dozen sample links. Pass `--force` to replace existing rows.
+`npm run db:seed` creates two demo users (see script output for passwords), default orgs, and sample links split across them. Pass `--force` to replace existing rows.
 
 ### Cursor worktrees
 
-When Cursor creates a git worktree, [`.cursor/worktrees.json`](.cursor/worktrees.json) runs [`.cursor/setup-worktree-unix.sh`](.cursor/setup-worktree-unix.sh): `npm ci`, a worktree-local SQLite file (`sqlite.worktree.db` via `.env.local`), migrations, seed data, and Playwright Chromium. That keeps each agent checkout isolated from the primary `sqlite.db`.
+When Cursor creates a git worktree, [`.cursor/worktrees.json`](.cursor/worktrees.json) runs [`.cursor/setup-worktree-unix.sh`](.cursor/setup-worktree-unix.sh): `npm ci`, a worktree-local SQLite file (`sqlite.worktree.db` via `.env.local`), auth env vars, migrations, seed data, and Playwright Chromium. That keeps each agent checkout isolated from the primary `sqlite.db`.
 
 ## Scripts
 
@@ -33,5 +37,5 @@ When Cursor creates a git worktree, [`.cursor/worktrees.json`](.cursor/worktrees
 | `npm run dev` | Start dev server |
 | `npm run db:generate` | Generate Drizzle migrations |
 | `npm run db:migrate` | Apply migrations |
-| `npm run db:seed` | Insert sample links (use `-- --force` to replace) |
+| `npm run db:seed` | Insert sample users, orgs, and links (use `-- --force` to replace) |
 | `npm run db:studio` | Open Drizzle Studio |
