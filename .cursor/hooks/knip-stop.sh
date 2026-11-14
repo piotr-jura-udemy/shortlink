@@ -66,14 +66,17 @@ print(":".join(
 fi
 
 log "node=$(command -v node || echo missing) $(node -v 2>/dev/null || true)"
-log "running npm run knip (loop_count=${loop_count})"
+log "running npx knip (loop_count=${loop_count})"
 
 tmp="$(mktemp -t knip-stop.XXXXXX)"
 cleanup() { rm -f "$tmp"; }
 trap cleanup EXIT
 
+# Use npx (same as stryker-stop) so Knip runs from local node_modules
+# or is fetched when deps have not been installed yet.
+# `npm run knip` only works after install because the script is a bare `knip` binary.
 set +e
-npm run knip --silent >"$tmp" 2>&1
+npx --yes knip >"$tmp" 2>&1
 knip_exit=$?
 set -e
 
