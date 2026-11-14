@@ -65,6 +65,14 @@ print(":".join(
   export PATH
 fi
 
+if [[ ! -x "$ROOT/node_modules/.bin/knip" ]]; then
+  log "knip not installed — running npm install"
+  if ! npm install >&2; then
+    log "npm install failed — skipping Knip"
+    emit_empty
+  fi
+fi
+
 log "node=$(command -v node || echo missing) $(node -v 2>/dev/null || true)"
 log "running npm run knip (loop_count=${loop_count})"
 
