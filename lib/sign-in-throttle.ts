@@ -2,7 +2,7 @@ import { lt, sql } from "drizzle-orm";
 import { db } from "./db";
 import { signInAttempt } from "./schema";
 
-export const SIGN_IN_THROTTLE = {
+const SIGN_IN_THROTTLE = {
   windowMs: 15 * 60_000,
   max: 10,
 } as const;

@@ -16,10 +16,16 @@
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/reports/mutation/
 e2e.sqlite.db
 e2e.sqlite.db-*
 *.vitest.sqlite.db
 *.vitest.sqlite.db-*
+
+# cursor hook runtime state
+.cursor/hooks/state/
+.cursor/skip-knip-stop
+.cursor/skip-stryker-stop
 
 # next.js (default .next plus any NEXT_DIST_DIR overrides like .next-e2e)
 /.next/

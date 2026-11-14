@@ -1,10 +1,15 @@
 {
   "version": 1,
   "hooks": {
+    "afterFileEdit": [
+      {
+        "command": ".cursor/hooks/track-touched-files.sh"
+      }
+    ],
     "stop": [
       {
-        "command": ".cursor/hooks/knip-stop.sh",
-        "timeout": 120,
+        "command": ".cursor/hooks/quality-stop.sh",
+        "timeout": 600,
         "loop_limit": 3
       }
     ]
