@@ -1,0 +1,9 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreFiles": [
+    "lib/utils.ts"
+  ],
+  "ignoreIssues": {
+    "components/ui/**": ["exports", "types"]
+  }
+}
