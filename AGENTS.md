@@ -100,6 +100,22 @@ Stack and layering follow ADR 0002 (`docs/decisions/0002-vitest-playwright-testi
 - **Refactors:** Preserve existing behavioral expectations; do not change tests to match unintended new behavior.
 - **Integrity:** Never bypass git hooks, and never delete, skip, or weaken tests just to make the suite pass.
 
+### Tests have to fail when the behavior changes
+
+Stryker mutates the `lib/` files touched in the turn. A test that still passes after that behavior is removed does not cover it. Knip must stay clean. Do not widen `knip.json` ignores or Stryker `ignore` lists to clear either report.
+
+- Assert the value the branch exists to produce. A create test that only checks `organizationId` still passes if the custom slug is discarded. A delete test that only expects "not found" still passes if every delete fails.
+- Call both sides of a check. A valid payload executes `if (!parsed.success)` and does not cover it. The failing input has to be in the test, and so does a successful update or delete of the caller's own row.
+- Give each guard an input that only that guard rejects. Overlapping rejects in `safeNextPath` let either the leading-slash check or the `://` check be deleted.
+- When the code trims or lowercases, pass a value that is not already normalized, and show it is treated as the normalized one. This applies to throttle emails and IP header names.
+- Pin the boundary. "A 429 shows up somewhere in 15 attempts" does not lock `<= 10`. Assert the last allowed attempt and the first rejected one.
+- For a list, return more than one hit when there is no limit, and use a limit other than 1. Otherwise "stop at the limit" and "always stop after the first" are the same test.
+- If `revalidatePath`, `getSession`, or `createElement` is mocked, assert the arguments. A stub that ignores them lets the call be emptied.
+- Call the production function. A copy of the old algorithm inside the test file, such as `legacySafeNextPath`, covers nothing in the app.
+- Do not `readFileSync` source and match a regex as the behavior test. That does not run the function. `lib/auth-actions.test.ts` and `lib/links-exports.test.ts` cover zero mutants. A source assertion is only for an architectural rule that cannot be executed, and it sits beside a behavior test.
+- Drive Zod schemas with one accept and one reject per constraint. Module-level schemas are mostly invisible to Stryker because `ignoreStatic` is on. A score of `n/a` is not a pass.
+- Checking `SEED_USERS` does not test `main()`. `proxy.ts` needs a caller in Vitest. Playwright does not kill these mutants.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
