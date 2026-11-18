@@ -16,6 +16,81 @@ When UI or UX needs to be changed or decided, read `DESIGN.md`.
 - To record a new convention: propose it, get explicit agreement that it should become the current decision, update `DESIGN.md`, then implement.
 - Stack, auth, and storage still go through ADRs. If a design change implies architecture, ADR first (or alongside).
 
+# Feature sizing & slices
+
+Before planning or building a feature, size it. Do **not** blindly accept a request and jump into an implementation plan or code.
+
+## When is a change too big?
+
+Treat the request as too big if **any** of these apply:
+
+- It likely touches **more than ~10 files**
+- It likely changes **more than ~500 lines**
+- It **mixes multiple concerns** in one go (e.g. authentication + organizations + permissions)
+
+## If the request is too big → roadmap only, then stop
+
+- Do **not** plan the full implementation.
+- Do **not** write any code.
+- Output a **roadmap of slices**, then **stop**.
+
+Each slice in the roadmap must include:
+
+- **Goal** — what this slice delivers on its own
+- **Rough file list** — expected touch points
+- **Depends on** — which earlier slices (if any)
+- **Status** — `done` or `not done` (mark every slice; new roadmaps start as all `not done`)
+
+### Slice rules
+
+- Max **~10–15 files** and **~500 lines** per slice
+- Each slice is **merged on its own** (own PR / own merge)
+- Each slice has **its own tests**
+- Order slices **riskiest first** (unknowns, data model, auth boundaries before polish UI)
+
+### Example — too big → roadmap (then stop)
+
+Request: “Add auth, organizations, and role-based permissions.”
+
+```text
+Roadmap: Auth + orgs + permissions
+
+1. [not done] Session/auth foundation
+   Goal: Sign-in/out and a session the app can trust
+   Files (rough): auth routes, session helper, middleware, auth tests
+   Depends on: —
+
+2. [not done] Organization model
+   Goal: Create/list orgs; user belongs to an org
+   Files (rough): org schema/migration, org API, org tests
+   Depends on: 1
+
+3. [not done] Permissions checks
+   Goal: Enforce roles on one protected action end-to-end
+   Files (rough): roles helper, one API gate, one UI gate, permission tests
+   Depends on: 1, 2
+```
+
+Do not plan slice 2 or 3 implementation in the same chat. Do not write code.
+
+## If the request is one slice → plan that slice only
+
+- Write an implementation plan for **this slice only**.
+- Do **not** write code until explicitly asked to implement.
+- Do not expand into neighboring slices “while we’re here.”
+
+### Example — one slice → plan only (no code)
+
+Request: “Add click count to the shortlink redirect.”
+
+Fits one slice → plan files, behavior, and tests for click counting only. Stop after the plan unless asked to implement.
+
+## Never
+
+- Never plan or implement **more than one slice in a chat**
+- Never continue to the **next slice** without being asked
+- Never start coding when the output should be a **roadmap** or a **single-slice plan**
+
 # Testing
 
 Stack and layering follow ADR 0002 (`docs/decisions/0002-vitest-playwright-testing.md`): **Vitest** + **React Testing Library** for logic and components; **Playwright** for important browser journeys.
