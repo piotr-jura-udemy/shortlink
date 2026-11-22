@@ -28,13 +28,22 @@ Treat the request as too big if **any** of these apply:
 - It likely changes **more than ~500 lines**
 - It **mixes multiple concerns** in one go (e.g. authentication + organizations + permissions)
 
+## Where roadmaps and slice plans live
+
+- Save every roadmap at `docs/roadmaps/<feature-name>/roadmap.md`.
+- `<feature-name>` is one kebab-case directory per feature.
+- Save each slice plan in that same directory as `NN-<short-name>.md` (for example `docs/roadmaps/auth-orgs-permissions/01-session-auth.md`).
+- `NN` is the slice number from the roadmap, zero-padded so files sort in order. Add a short kebab-case name when the slice has one.
+- Write `roadmap.md` and each slice plan as bullets, in the same shape as the instructions below.
+
 ## If the request is too big → roadmap only, then stop
 
 - Do **not** plan the full implementation.
-- Do **not** write any code.
-- Output a **roadmap of slices**, then **stop**.
+- Do **not** write application code.
+- Do **not** write slice plan files in this chat.
+- Write `docs/roadmaps/<feature-name>/roadmap.md`, then **stop**.
 
-Each slice in the roadmap must include:
+Each slice in `roadmap.md` is a bullet and must include:
 
 - **Goal** — what this slice delivers on its own
 - **Rough file list** — expected touch points
@@ -47,48 +56,69 @@ Each slice in the roadmap must include:
 - Each slice is **merged on its own** (own PR / own merge)
 - Each slice has **its own tests**
 - Order slices **riskiest first** (unknowns, data model, auth boundaries before polish UI)
+- Leave **Status** at `not done` until that slice’s pull request is merged
+- When that pull request is merged, set **Status** to `done` in `roadmap.md`
 
 ### Example — too big → roadmap (then stop)
 
 Request: “Add auth, organizations, and role-based permissions.”
 
-```text
-Roadmap: Auth + orgs + permissions
+Write `docs/roadmaps/auth-orgs-permissions/roadmap.md` with bullets:
 
-1. [not done] Session/auth foundation
-   Goal: Sign-in/out and a session the app can trust
-   Files (rough): auth routes, session helper, middleware, auth tests
-   Depends on: —
+- **1. Session/auth foundation** — `not done`
+  - **Goal:** Sign-in/out and a session the app can trust
+  - **Rough file list:** auth routes, session helper, middleware, auth tests
+  - **Depends on:** —
+- **2. Organization model** — `not done`
+  - **Goal:** Create/list orgs; user belongs to an org
+  - **Rough file list:** org schema/migration, org API, org tests
+  - **Depends on:** 1
+- **3. Permissions checks** — `not done`
+  - **Goal:** Enforce roles on one protected action end-to-end
+  - **Rough file list:** roles helper, one API gate, one UI gate, permission tests
+  - **Depends on:** 1, 2
 
-2. [not done] Organization model
-   Goal: Create/list orgs; user belongs to an org
-   Files (rough): org schema/migration, org API, org tests
-   Depends on: 1
-
-3. [not done] Permissions checks
-   Goal: Enforce roles on one protected action end-to-end
-   Files (rough): roles helper, one API gate, one UI gate, permission tests
-   Depends on: 1, 2
-```
-
-Do not plan slice 2 or 3 implementation in the same chat. Do not write code.
+Do not plan slice 2 or 3 in the same chat. Do not write application code.
 
 ## If the request is one slice → plan that slice only
 
-- Write an implementation plan for **this slice only**.
+- When `docs/roadmaps/<feature-name>/roadmap.md` exists, read it first.
+- Plan the next slice whose **Status** is `not done`, or the slice the user names.
+- If that slice’s pull request is already merged, set its **Status** to `done` and choose again from what is still `not done`.
+- Save the plan beside the roadmap as `docs/roadmaps/<feature-name>/NN-<short-name>.md`.
+- A one-slice request with no roadmap still gets that file under `docs/roadmaps/<feature-name>/`.
+- Write the plan as bullets:
+  - **Goal** — what this slice delivers
+  - **Files** — files to add or change
+  - **Behavior** — what the slice does, including edge cases
+  - **Tests** — what will prove the behavior
+  - **Depends on** — earlier slices, or — if none
 - Do **not** write code until explicitly asked to implement.
+- When asked to implement, build **this slice only**.
 - Do not expand into neighboring slices “while we’re here.”
+- The next slice chat starts again by reading `roadmap.md`. It plans, and builds only when asked, the next `not done` slice or the slice the user names.
 
 ### Example — one slice → plan only (no code)
 
 Request: “Add click count to the shortlink redirect.”
 
-Fits one slice → plan files, behavior, and tests for click counting only. Stop after the plan unless asked to implement.
+Fits one slice → save `docs/roadmaps/click-count/01-redirect-click-count.md`:
+
+- **Goal:** Count clicks when a short link redirects
+- **Files:** redirect route, click storage, click tests
+- **Behavior:** each successful redirect increments the count once
+- **Tests:** redirect stores a click; a missing link does not
+- **Depends on:** —
+
+Stop after the plan unless asked to implement. On a larger roadmap, leave **Status** `not done` until that slice’s pull request is merged.
 
 ## Never
 
 - Never plan or implement **more than one slice in a chat**
-- Never continue to the **next slice** without being asked
+- Never continue to the **next slice** in the same chat
+- Never start a slice chat without reading `roadmap.md` when that file exists
+- Never build a slice other than the next `not done` one, unless the user names the slice
+- Never mark a slice `done` before its pull request is merged
 - Never start coding when the output should be a **roadmap** or a **single-slice plan**
 
 # Testing
