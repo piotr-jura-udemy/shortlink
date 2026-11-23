@@ -90,4 +90,8 @@ CREATE TABLE `verification` (
 	`updated_at` integer NOT NULL
 );
 --> statement-breakpoint
+-- Pre-auth DBs may already have rows; SQLite rejects ADD NOT NULL without a
+-- default when the table is non-empty. Orphan links have no owner after ADR
+-- 0003, so clear them before requiring organization_id.
+DELETE FROM `links`;--> statement-breakpoint
 ALTER TABLE `links` ADD `organization_id` text NOT NULL REFERENCES organization(id);
